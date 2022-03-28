@@ -7,6 +7,12 @@ import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 import java.util.UUID
 
+/**
+ * D:\java大数据\互联网广告\互联网广告第一天\informationOut
+ * D:\java大数据\互联网广告\互联网广告第一天\app_mappings.txt
+ * D:\java大数据\互联网广告\互联网广告第一天\stopword.txt
+ * D:\java大数据\互联网广告\互联网广告第一天\tagOutPut
+ */
 object TagRpt {
 
   def main(args: Array[String]): Unit = {
@@ -29,7 +35,7 @@ object TagRpt {
     import spark.implicits._
 
     // 接收参数
-    var Array(inputPath,app_Mapping,stopWords, outputPath) = args
+    var Array(inputPath, app_Mapping, stopWords, outputPath) = args
 
     // 读取app_Mapping广播变量.
     val app_map: Map[String, String] = sc.textFile(app_Mapping).map(line => {
@@ -70,12 +76,9 @@ object TagRpt {
         (UUID.randomUUID().toString.substring(0, 6), (adsMap ++ appMap ++ driverMap ++ keyMap ++ pcMap).toList)
       }
     })
-    TagDS.rdd.reduceByKey((list1,list2)=>{
-      (list1++list2).groupBy(_._1).mapValues(_.foldLeft(0)(_+_._2)).toList
+    TagDS.rdd.reduceByKey((list1, list2) => {
+      (list1 ++ list2).groupBy(_._1).mapValues(_.foldLeft(0)(_ + _._2)).toList
     }).saveAsTextFile(outputPath)
-
-
-
 
 
   }
